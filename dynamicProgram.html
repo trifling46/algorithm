@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+
+</body>
+<script>
+    function knapSack(val,capacity){
+        var T = []
+        var n = val.length
+
+        for(let i = 0;i < n;i++){
+            T[i] = [];
+            for(let j=0;j <= capacity;j++){
+                if(j === 0){ //容量为0
+                    T[i][j] = 0;
+                    continue;
+                }
+                if(j < val[i]){ //容量小于物品重量，本行hold不住
+                    if(i === 0){
+                        T[i][j] = 0; // i = 0时，不存在i-1，所以T[i][j]取0
+
+                    }else{
+                        T[i][j] = T[i-1][j]; //容量小于物品重量，参照上一行
+
+                    }
+                    continue;
+                }
+                if(i === 0){
+                    T[i][j] = val[i]; //第0行，不存在 i-1, 最多只能放这一行的那一个物品
+                }else{
+                    T[i][j] = Math.max(val[i] + T[i-1][j-val[i]],T[i-1][j]);
+
+                }
+            }
+
+        }
+
+        let obj = findValue(val,capacity,n,T);
+        return obj;
+    }
+
+    //找到需要的物品
+    function findValue(val,capacity,n,T){
+
+        var i = n-1, j = capacity;
+        var arr = []
+        var copy = val.slice(0)
+        while ( i > 0 && j > 0 ){
+            if(T[i][j] != T[i-1][j]){
+                arr.push(val[i])
+                copy.splice(i,1)
+                j = j- val[i];
+                i--;
+            }else{
+                i--;  //如果相等，那么就到 i-1 行
+            }
+        }
+        if(i == 0 ){
+            if(T[i][j] != 0){ //那么第一行的物品也可以取
+                arr.push(val[i])
+                copy.splice(i,1)
+            }
+        }
+        return {
+            arr:arr,
+            copy:copy
+        }
+    }
+
+
+    let arr = []
+    function getAllResult(values,capacity,num) {
+        let obj1 = knapSack(values,capacity)
+        arr.push(obj1.arr)
+        num--
+        while (num--){
+            obj1 = knapSack(obj1.copy,capacity)
+            arr.push(obj1.arr)
+        }
+    }
+
+    var values = [14,3,5,17,4,4,4,8,9]
+    var num = 3
+        capacity = parseInt(eval(values.join('+'))/num)
+    getAllResult(values,capacity,3)
+    console.log(capacity,arr)
+
+</script>
+</html>
